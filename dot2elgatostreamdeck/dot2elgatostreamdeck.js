@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.0.0
+//dot2elgatestreamdeck beta v.1.0.2
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -159,7 +159,7 @@ client.onopen = function () {
 client.onclose = function () {
     console.log('Client Closed');
     streamDeck.clearPanel();
-    process.exit();
+    //process.exit();
 };
 
 client.onmessage = function (e) {
@@ -265,46 +265,3 @@ client.onmessage = function (e) {
         }
     }
 };
-
-
-
-/*                for (k = 0; k < 6; k++) {
-            for (i = 0; i < 8; i++) {
-                keyNr = (wing - i - k - 1);
-                console.log(keyNr);
-                if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
-                    streamDeck.fillKeyBuffer( 2 , imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-                } else if (obj.itemGroups[k].items[i][0].isRun == 1) {
-                    streamDeck.fillKeyBuffer( 2 , imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-                } else {
-                    streamDeck.fillKeyBuffer( 2 , imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-                }
-        }
-    }
-*/
-
-
-                //console.log(obj.itemGroups[0].items[0][0].i.c);
-
-                /*
-                var hexColor = (obj.itemGroups[0].items[0][0].bdC);
-                const [r, g, b] = hexToRgb(hexColor);
-                //console.log(`RGB: ${r}, ${g}, ${b}`);
-                streamDeck.fillKeyColor(0, r, g, b).catch((e) => console.error('Fill failed:', e));
-                */
-
-
-
-
-                /*
-                                const [r, g, b] = hexToRgb(hexColor);
-                
-                                if (obj.itemGroups[0].items[0][0].isRun == 1) {
-                                    streamDeck.fillKeyBuffer(0, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
-                                } else {
-                                    streamDeck.fillKeyBuffer(0, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
-                                }
-                */
-
-                //console.log(streamDeck.KEY_COLUMNS);
-                //console.log(streamDeck.KEY_ROWS);
