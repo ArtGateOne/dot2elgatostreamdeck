@@ -1,0 +1,24 @@
+{
+  "name": "dot2elgatostreamdeck",
+  "version": "1.0.0",
+  "description": "none",
+  "main": "dot2streamdeck.js",
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "none"
+  ],
+  "author": "ArtGateOne",
+  "license": "ISC",
+  "dependencies": {
+    "@elgato-stream-deck/node": "^5.7.2",
+    "@julusian/jpeg-turbo": "^2.0.0",
+    "sharp": "^0.32.0",
+    "websocket": "^1.0.34"
+  }
+}
