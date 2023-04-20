@@ -83,7 +83,7 @@ for (i = 0; i < wing; i++) {
     ledmatrix[i] = -1;
 }
 
-setBwingButtons();
+
 
 function setBwingButtons() {
     if (bwing == 2) {
@@ -106,6 +106,8 @@ function setBwingButtons() {
 
     return;
 }
+
+setBwingButtons();
 
 
 streamDeck.on('down', (keyIndex) => {
