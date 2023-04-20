@@ -19,7 +19,7 @@ turn on webremote (password remote)
 Open dot2elgatostreamdeck.js use node.exe !
 
 
-Store some exec on bwing page 1 (left up)
+Store some exec on bwing2 page 1 (left up)
 
 
 
