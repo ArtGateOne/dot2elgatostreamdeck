@@ -29,3 +29,24 @@ Store some exec on bwing2 page 1 (left up)
 run from command prompt (win+R - cmd)
 
 node dot2elgatostreamdeck.js
+
+
+------------
+beta
+
+1.0.2 Public
+
+1.0.36 Add select B-wing
+
+
+//CONFIG
+
+var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
+
+var Page = 1;       //Set Page nr (start)
+
+var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
+
+//END-------------------------------
+
+...
