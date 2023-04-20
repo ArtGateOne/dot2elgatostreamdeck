@@ -28,4 +28,4 @@ Store some exec on bwing2 page 1 (left up)
 
 run from command prompt (win+R - cmd)
 
-node dot2apcmini2.js
+node dot2elgatostreamdeck.js
