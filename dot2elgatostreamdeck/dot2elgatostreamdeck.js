@@ -55,6 +55,7 @@ const imgExecOff = jpegJS.decode(rawExecOff).data;
 var request = -2;
 var session = 0;
 var wing = 0;
+var dot2wing = 1 //default: 2
 var pageIndex = (Page - 1);
 var colorpage = 5;
 var button = 0;
@@ -70,15 +71,23 @@ for (i = 0; i < wing; i++) {
     ledmatrix[i] = -1;
 }
 
-
-if (wing == 6) {
-    var buttons = [315, 314, 313, 415, 414, 413];
-} else if (wing == 15) {
-    var buttons = [315, 314, 313, 312, 311, 415, 414, 413, 412, 411, 515, 514, 513, 512, 511];
-} else if (wing == 32) {
-    var buttons = [315, 314, 313, 312, 311, 310, 309, 308, 415, 414, 413, 412, 411, 410, 409, 408, 515, 514, 513, 512, 511, 510, 509, 508, 615, 614, 613, 612, 611, 610, 609, 608];
-}
-
+if (dot2wing == 2){
+	if (wing == 6) {
+		var buttons = [315, 314, 313, 415, 414, 413];
+	} else if (wing == 15) {
+		var buttons = [315, 314, 313, 312, 311, 415, 414, 413, 412, 411, 515, 514, 513, 512, 511];
+	} else if (wing == 32) {
+		var buttons = [315, 314, 313, 312, 311, 310, 309, 308, 415, 414, 413, 412, 411, 410, 409, 408, 515, 514, 513, 512, 511, 510, 509, 508, 615, 614, 613, 612, 611, 610, 609, 608];
+	}
+} else if (dot2wing == 1){
+	if (wing == 6) {
+		var buttons = [307, 306, 305, 407, 406, 405];
+	} else if (wing == 15) {
+		var buttons = [307, 306, 305, 304, 303, 407, 406, 405, 404, 403, 507, 506, 505, 504, 503];
+	} else if (wing == 32) {
+		var buttons = [307, 306, 305, 304, 303, 302, 301, 300, 407, 406, 405, 404, 403, 402, 401, 400, 507, 506, 505, 504, 503, 502, 501, 500, 607, 606, 605, 604, 603, 602, 601, 600];
+	}
+}	
 
 streamDeck.on('down', (keyIndex) => {
     client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":true,"released":false,"type":0,"session":' + session + ',"maxRequests":0}');
@@ -102,16 +111,27 @@ sleep(1000, function () {
 //interval send data to server function
 function interval() {
     if (session > 0) {
-
-        if (wing == 6) {
-            client.send('{"requestType":"playbacks","startIndex":[313,413],"itemsCount":[3,3],"pageIndex":' + pageIndex + ',"itemsType":[3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
-        } else if (wing == 15) {
-            client.send('{"requestType":"playbacks","startIndex":[311,411,511],"itemsCount":[5,5,5],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
-        } else if (wing == 32) {
-            client.send('{"requestType":"playbacks","startIndex":[308,408,508,608],"itemsCount":[8,8,8,8],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
-        } else {
-            client.send('{"requestType":"playbacks","startIndex":[315],"itemsCount":[1],"pageIndex":' + pageIndex + ',"itemsType":[3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
-        }
+		if (dot2wing == 2){
+			if (wing == 6) {
+				client.send('{"requestType":"playbacks","startIndex":[313,413],"itemsCount":[3,3],"pageIndex":' + pageIndex + ',"itemsType":[3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else if (wing == 15) {
+				client.send('{"requestType":"playbacks","startIndex":[311,411,511],"itemsCount":[5,5,5],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else if (wing == 32) {
+				client.send('{"requestType":"playbacks","startIndex":[308,408,508,608],"itemsCount":[8,8,8,8],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else {
+				client.send('{"requestType":"playbacks","startIndex":[315],"itemsCount":[1],"pageIndex":' + pageIndex + ',"itemsType":[3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			}
+		} else if (dot2wing == 1){
+			if (wing == 6) {
+				client.send('{"requestType":"playbacks","startIndex":[305,405],"itemsCount":[3,3],"pageIndex":' + pageIndex + ',"itemsType":[3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else if (wing == 15) {
+				client.send('{"requestType":"playbacks","startIndex":[303,403,503],"itemsCount":[5,5,5],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else if (wing == 32) {
+				client.send('{"requestType":"playbacks","startIndex":[300,400,500,600],"itemsCount":[8,8,8,8],"pageIndex":' + pageIndex + ',"itemsType":[3,3,3,3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			} else {
+				client.send('{"requestType":"playbacks","startIndex":[307],"itemsCount":[1],"pageIndex":' + pageIndex + ',"itemsType":[3],"view":3,"execButtonViewMode":2,"buttonsViewMode":0,"session":' + session + ',"maxRequests":1}');
+			}
+		}
     }
 }
 
