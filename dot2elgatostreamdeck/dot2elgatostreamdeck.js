@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.0.39
+//dot2elgatestreamdeck beta v.1.0.40
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -17,6 +17,8 @@ var Page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 //END-------------------------------
 
+const streamDeck = openStreamDeck();
+streamDeck.clearPanel();
 
 if (bwing == 0) {
     //wallpaper = 0;    //<------------- uncomment to auto wallpaper off when boot bwing is on
@@ -25,8 +27,8 @@ if (bwing == 0) {
 
 if (wallpaper == 1) {
     ; (async () => {
-        const streamDeck = openStreamDeck()
-        await streamDeck.clearPanel()
+        //const streamDeck = openStreamDeck()
+        //await streamDeck.clearPanel()
 
         const image = await sharp(path.resolve(__dirname, 'fixtures/dot2.png'))
             .flatten()
@@ -41,9 +43,6 @@ if (wallpaper == 1) {
         })
     })()
 }
-
-const streamDeck = openStreamDeck();
-streamDeck.clearPanel();
 
 const rawExecEmpty = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecEmpty_${streamDeck.ICON_SIZE}.jpg`));
 const imgExecEmpty = jpegJS.decode(rawExecEmpty).data;
