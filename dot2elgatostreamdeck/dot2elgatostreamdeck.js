@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.0.40
+//dot2elgatestreamdeck beta v.1.0.43
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -17,14 +17,61 @@ var Page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 //END-------------------------------
 
+
+var request = -2;
+var session = 0;
+var wing = 0;
+var pageIndex = (Page - 1);
+var colorpage = 5;  //not used - color palete page
+var button = 0;
+var buttons = [0, 1, 2];
+var ledmatrix = [-1, -1, -1];
+
 const streamDeck = openStreamDeck();
 streamDeck.clearPanel();
 
+const rawExecEmpty = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecEmpty_${streamDeck.ICON_SIZE}.jpg`));    //Exec Empty icon
+const imgExecEmpty = jpegJS.decode(rawExecEmpty).data;
+const rawExecOn = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOn_${streamDeck.ICON_SIZE}.jpg`));          //Exec ON icon
+const imgExecOn = jpegJS.decode(rawExecOn).data;
+const rawExecOff = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOff_${streamDeck.ICON_SIZE}.jpg`));        //Exec OFF icon
+const imgExecOff = jpegJS.decode(rawExecOff).data;
+
 if (bwing == 0) {
-    //wallpaper = 0;    //<------------- uncomment to auto wallpaper off when boot bwing is on
+    var rawButtonBWS = fs.readFileSync(path.resolve(__dirname, `fixtures/selectbwing_${streamDeck.ICON_SIZE}.jpg`));
+    var imgButtonBWS = jpegJS.decode(rawButtonBWS).data;
+    var rawButtonBW1 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing1_${streamDeck.ICON_SIZE}.jpg`));
+    var imgButtonBW1 = jpegJS.decode(rawButtonBW1).data;
+    var rawButtonBW2 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing2_${streamDeck.ICON_SIZE}.jpg`));
+    var imgButtonBW2 = jpegJS.decode(rawButtonBW2).data;
+
+    streamDeck.fillKeyBuffer(0, imgButtonBWS, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+    streamDeck.fillKeyBuffer(1, imgButtonBW1, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+    streamDeck.fillKeyBuffer(2, imgButtonBW2, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+}
+
+//console.log(streamDeck.ICON_SIZE);
+//console.log(streamDeck.KEY_COLUMNS);
+//console.log(streamDeck.KEY_ROWS);
+
+//stream deck no buttons
+wing = (streamDeck.KEY_COLUMNS * streamDeck.KEY_ROWS);
+
+//load and draw select B-wing buttons 0 1 2
+
+
+//set matrix to exec empty (-1)
+for (i = 0; i < wing; i++) {
+    ledmatrix[i] = -1;
+}
+
+//auto off wallpaper
+if (bwing == 0) {
+    wallpaper = 0;    //<------------- set to 1 - auto off wallpaper (select bwing boot)
     var buttons = [0, 0, 0];
 }
 
+//wallpaper
 if (wallpaper == 1) {
     ; (async () => {
         //const streamDeck = openStreamDeck()
@@ -44,99 +91,7 @@ if (wallpaper == 1) {
     })()
 }
 
-const rawExecEmpty = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecEmpty_${streamDeck.ICON_SIZE}.jpg`));
-const imgExecEmpty = jpegJS.decode(rawExecEmpty).data;
-const rawExecOn = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOn_${streamDeck.ICON_SIZE}.jpg`));
-const imgExecOn = jpegJS.decode(rawExecOn).data;
-const rawExecOff = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOff_${streamDeck.ICON_SIZE}.jpg`));
-const imgExecOff = jpegJS.decode(rawExecOff).data;
-
-if (bwing == 0) {
-    rawButtonBWS = fs.readFileSync(path.resolve(__dirname, `fixtures/selectbwing_${streamDeck.ICON_SIZE}.jpg`));
-    imgButtonBWS = jpegJS.decode(rawButtonBWS).data;
-    rawButtonBW1 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing1_${streamDeck.ICON_SIZE}.jpg`));
-    imgButtonBW1 = jpegJS.decode(rawButtonBW1).data;
-    rawButtonBW2 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing2_${streamDeck.ICON_SIZE}.jpg`));
-    imgButtonBW2 = jpegJS.decode(rawButtonBW2).data;
-
-    streamDeck.fillKeyBuffer(0, imgButtonBWS, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-    streamDeck.fillKeyBuffer(1, imgButtonBW1, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-    streamDeck.fillKeyBuffer(2, imgButtonBW2, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-}
-
-var request = -2;
-var session = 0;
-var wing = 0;
-var pageIndex = (Page - 1);
-var colorpage = 5;
-var button = 0;
-var buttons = [0, 1, 2];
-var ledmatrix = [-1, -1, -1];
-
-//console.log(streamDeck.ICON_SIZE);
-//console.log(streamDeck.KEY_COLUMNS);
-//console.log(streamDeck.KEY_ROWS);
-
-wing = (streamDeck.KEY_COLUMNS * streamDeck.KEY_ROWS);
-
-for (i = 0; i < wing; i++) {
-    ledmatrix[i] = -1;
-}
-
-
-
-function setBwingButtons() {
-    if (bwing == 2) {
-        if (wing == 6) {
-            buttons = [315, 314, 313, 415, 414, 413];
-        } else if (wing == 15) {
-            buttons = [315, 314, 313, 312, 311, 415, 414, 413, 412, 411, 515, 514, 513, 512, 511];
-        } else if (wing == 32) {
-            buttons = [315, 314, 313, 312, 311, 310, 309, 308, 415, 414, 413, 412, 411, 410, 409, 408, 515, 514, 513, 512, 511, 510, 509, 508, 615, 614, 613, 612, 611, 610, 609, 608];
-        }
-    } else if (bwing == 1) {
-        if (wing == 6) {
-            buttons = [307, 306, 305, 407, 406, 405];
-        } else if (wing == 15) {
-            buttons = [307, 306, 305, 304, 303, 407, 406, 405, 404, 403, 507, 506, 505, 504, 503];
-        } else if (wing == 32) {
-            buttons = [307, 306, 305, 304, 303, 302, 301, 300, 407, 406, 405, 404, 403, 402, 401, 400, 507, 506, 505, 504, 503, 502, 501, 501, 607, 606, 605, 604, 603, 602, 601, 600];
-        }
-    }
-
-    return;
-}
-
-setBwingButtons();
-
-
-streamDeck.on('down', (keyIndex) => {
-    if (bwing == 0) {
-        //nothing
-    } else {
-        client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":true,"released":false,"type":0,"session":' + session + ',"maxRequests":0}');
-    }
-
-})
-
-streamDeck.on('up', (keyIndex) => {
-    if (bwing == 0) {
-        if (keyIndex == 1 || keyIndex == 2) {
-            ledmatrix = [-2, -2, -2];
-            console.log("B-wing " + keyIndex);
-            bwing = keyIndex;
-            setBwingButtons();
-        }
-    } else {
-        client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":false,"released":true,"type":0,"session":' + session + ',"maxRequests":0}');
-    }
-})
-
-streamDeck.on('error', (error) => {
-    console.error(error)
-})
-
-//sleep 1000
+//sleep function
 sleep(1000, function () {
     // executes after one second, and blocks the thread
 });
@@ -182,6 +137,7 @@ function sleep(time, callback) {
     callback();
 }
 
+//hexToRgb function
 function hexToRgb(hex) {
     const r = parseInt(hex.substring(1, 3), 16);
     const g = parseInt(hex.substring(3, 5), 16);
@@ -189,6 +145,58 @@ function hexToRgb(hex) {
 
     return [r, g, b];
 }
+
+//set B-wing Buttons key numbers functions
+function setBwingButtons() {
+    if (bwing == 2) {
+        if (wing == 6) {
+            buttons = [315, 314, 313, 415, 414, 413];
+        } else if (wing == 15) {
+            buttons = [315, 314, 313, 312, 311, 415, 414, 413, 412, 411, 515, 514, 513, 512, 511];
+        } else if (wing == 32) {
+            buttons = [315, 314, 313, 312, 311, 310, 309, 308, 415, 414, 413, 412, 411, 410, 409, 408, 515, 514, 513, 512, 511, 510, 509, 508, 615, 614, 613, 612, 611, 610, 609, 608];
+        }
+    } else if (bwing == 1) {
+        if (wing == 6) {
+            buttons = [307, 306, 305, 407, 406, 405];
+        } else if (wing == 15) {
+            buttons = [307, 306, 305, 304, 303, 407, 406, 405, 404, 403, 507, 506, 505, 504, 503];
+        } else if (wing == 32) {
+            buttons = [307, 306, 305, 304, 303, 302, 301, 300, 407, 406, 405, 404, 403, 402, 401, 400, 507, 506, 505, 504, 503, 502, 501, 501, 607, 606, 605, 604, 603, 602, 601, 600];
+        }
+    }
+
+    return;
+}
+
+setBwingButtons();
+
+
+streamDeck.on('down', (keyIndex) => {
+    if (bwing == 0) {
+        //nothing
+    } else {
+        client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":true,"released":false,"type":0,"session":' + session + ',"maxRequests":0}');
+    }
+
+});
+
+streamDeck.on('up', (keyIndex) => {
+    if (bwing == 0) {
+        if (keyIndex == 1 || keyIndex == 2) {
+            ledmatrix = [-2, -2, -2];
+            console.log("B-wing " + keyIndex);
+            bwing = keyIndex;
+            setBwingButtons();
+        }
+    } else {
+        client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":false,"released":true,"type":0,"session":' + session + ',"maxRequests":0}');
+    }
+});
+
+streamDeck.on('error', (error) => {
+    console.error(error)
+});
 
 
 
@@ -220,9 +228,10 @@ client.onclose = function () {
 
 client.onmessage = function (e) {
 
-
     request = request + 1;
+
     //console.log(request);
+
     if (request >= 10) {
         client.send('{"session":' + session + '}');
         client.send('{"requestType":"getdata","data":"set","session":' + session + ',"maxRequests":1}');
