@@ -32,8 +32,12 @@ node dot2elgatostreamdeck.js
 
 
 ------------
+
+work in progress (page select buttons ...)
+
+
 beta
-1.1.38 Add color mode 2 & color icons
+1.1.38 Add color mode (mode 2) & color icons (mode 3)
 
 //CONFIG
 
