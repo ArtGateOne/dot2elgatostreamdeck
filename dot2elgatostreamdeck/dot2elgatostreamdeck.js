@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.0.43
+//dot2elgatestreamdeck beta v.1.1.38
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -9,33 +9,112 @@ const fs = require('fs');
 const jpegJS = require('jpeg-js');
 const { openStreamDeck } = require('@elgato-stream-deck/node');
 
-
-
 //CONFIG
 var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
-var Page = 1;       //Set Page nr (start)
+var page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
-//END-------------------------------
+var mode = 3;  //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
 
+//Colors - 0 off, 1 on
+var R0 = 255;
+var G0 = 127;
+var B0 = 0;
+var R1 = 0;
+var G1 = 0;
+var B1 = 127;
+//END-------------------------------
 
 var request = -2;
 var session = 0;
 var wing = 0;
-var pageIndex = (Page - 1);
-var colorpage = 5;  //not used - color palete page
 var button = 0;
 var buttons = [0, 1, 2];
 var ledmatrix = [-1, -1, -1];
+var ledmatrixc = [-2, -2, -2];
+var array_off = [];
+var array_on = [];
+pageIndex = (page - 1);
+
 
 const streamDeck = openStreamDeck();
 streamDeck.clearPanel();
 
+
+//default icons
 const rawExecEmpty = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecEmpty_${streamDeck.ICON_SIZE}.jpg`));    //Exec Empty icon
 const imgExecEmpty = jpegJS.decode(rawExecEmpty).data;
 const rawExecOn = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOn_${streamDeck.ICON_SIZE}.jpg`));          //Exec ON icon
 const imgExecOn = jpegJS.decode(rawExecOn).data;
 const rawExecOff = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOff_${streamDeck.ICON_SIZE}.jpg`));        //Exec OFF icon
 const imgExecOff = jpegJS.decode(rawExecOff).data;
+
+//color icons
+const raw_off_0 = fs.readFileSync(path.resolve(__dirname, `pallete/off/0_${streamDeck.ICON_SIZE}.jpg`));
+array_off[0] = jpegJS.decode(raw_off_0).data;
+const raw_off_1 = fs.readFileSync(path.resolve(__dirname, `pallete/off/1_${streamDeck.ICON_SIZE}.jpg`));
+array_off[1] = jpegJS.decode(raw_off_1).data;
+const raw_off_2 = fs.readFileSync(path.resolve(__dirname, `pallete/off/2_${streamDeck.ICON_SIZE}.jpg`));
+array_off[2] = jpegJS.decode(raw_off_2).data;
+const raw_off_3 = fs.readFileSync(path.resolve(__dirname, `pallete/off/3_${streamDeck.ICON_SIZE}.jpg`));
+array_off[3] = jpegJS.decode(raw_off_3).data;
+const raw_off_4 = fs.readFileSync(path.resolve(__dirname, `pallete/off/4_${streamDeck.ICON_SIZE}.jpg`));
+array_off[4] = jpegJS.decode(raw_off_4).data;
+const raw_off_5 = fs.readFileSync(path.resolve(__dirname, `pallete/off/5_${streamDeck.ICON_SIZE}.jpg`));
+array_off[5] = jpegJS.decode(raw_off_5).data;
+const raw_off_6 = fs.readFileSync(path.resolve(__dirname, `pallete/off/6_${streamDeck.ICON_SIZE}.jpg`));
+array_off[6] = jpegJS.decode(raw_off_6).data;
+const raw_off_7 = fs.readFileSync(path.resolve(__dirname, `pallete/off/7_${streamDeck.ICON_SIZE}.jpg`));
+array_off[7] = jpegJS.decode(raw_off_7).data;
+const raw_off_8 = fs.readFileSync(path.resolve(__dirname, `pallete/off/8_${streamDeck.ICON_SIZE}.jpg`));
+array_off[8] = jpegJS.decode(raw_off_8).data;
+const raw_off_9 = fs.readFileSync(path.resolve(__dirname, `pallete/off/9_${streamDeck.ICON_SIZE}.jpg`));
+array_off[9] = jpegJS.decode(raw_off_9).data;
+const raw_off_10 = fs.readFileSync(path.resolve(__dirname, `pallete/off/10_${streamDeck.ICON_SIZE}.jpg`));
+array_off[10] = jpegJS.decode(raw_off_10).data;
+const raw_off_11 = fs.readFileSync(path.resolve(__dirname, `pallete/off/11_${streamDeck.ICON_SIZE}.jpg`));
+array_off[11] = jpegJS.decode(raw_off_11).data;
+const raw_off_12 = fs.readFileSync(path.resolve(__dirname, `pallete/off/12_${streamDeck.ICON_SIZE}.jpg`));
+array_off[12] = jpegJS.decode(raw_off_12).data;
+const raw_off_13 = fs.readFileSync(path.resolve(__dirname, `pallete/off/13_${streamDeck.ICON_SIZE}.jpg`));
+array_off[13] = jpegJS.decode(raw_off_13).data;
+const raw_off_14 = fs.readFileSync(path.resolve(__dirname, `pallete/off/14_${streamDeck.ICON_SIZE}.jpg`));
+array_off[14] = jpegJS.decode(raw_off_14).data;
+const raw_off_15 = fs.readFileSync(path.resolve(__dirname, `pallete/off/15_${streamDeck.ICON_SIZE}.jpg`));
+array_off[15] = jpegJS.decode(raw_off_15).data;
+
+const raw_on_0 = fs.readFileSync(path.resolve(__dirname, `pallete/on/0_${streamDeck.ICON_SIZE}.jpg`));
+array_on[0] = jpegJS.decode(raw_on_0).data;
+const raw_on_1 = fs.readFileSync(path.resolve(__dirname, `pallete/on/1_${streamDeck.ICON_SIZE}.jpg`));
+array_on[1] = jpegJS.decode(raw_on_1).data;
+const raw_on_2 = fs.readFileSync(path.resolve(__dirname, `pallete/on/2_${streamDeck.ICON_SIZE}.jpg`));
+array_on[2] = jpegJS.decode(raw_on_2).data;
+const raw_on_3 = fs.readFileSync(path.resolve(__dirname, `pallete/on/3_${streamDeck.ICON_SIZE}.jpg`));
+array_on[3] = jpegJS.decode(raw_on_3).data;
+const raw_on_4 = fs.readFileSync(path.resolve(__dirname, `pallete/on/4_${streamDeck.ICON_SIZE}.jpg`));
+array_on[4] = jpegJS.decode(raw_on_4).data;
+const raw_on_5 = fs.readFileSync(path.resolve(__dirname, `pallete/on/5_${streamDeck.ICON_SIZE}.jpg`));
+array_on[5] = jpegJS.decode(raw_on_5).data;
+const raw_on_6 = fs.readFileSync(path.resolve(__dirname, `pallete/on/6_${streamDeck.ICON_SIZE}.jpg`));
+array_on[6] = jpegJS.decode(raw_on_6).data;
+const raw_on_7 = fs.readFileSync(path.resolve(__dirname, `pallete/on/7_${streamDeck.ICON_SIZE}.jpg`));
+array_on[7] = jpegJS.decode(raw_on_7).data;
+const raw_on_8 = fs.readFileSync(path.resolve(__dirname, `pallete/on/8_${streamDeck.ICON_SIZE}.jpg`));
+array_on[8] = jpegJS.decode(raw_on_8).data;
+const raw_on_9 = fs.readFileSync(path.resolve(__dirname, `pallete/on/9_${streamDeck.ICON_SIZE}.jpg`));
+array_on[9] = jpegJS.decode(raw_on_9).data;
+const raw_on_10 = fs.readFileSync(path.resolve(__dirname, `pallete/on/10_${streamDeck.ICON_SIZE}.jpg`));
+array_on[10] = jpegJS.decode(raw_on_10).data;
+const raw_on_11 = fs.readFileSync(path.resolve(__dirname, `pallete/on/11_${streamDeck.ICON_SIZE}.jpg`));
+array_on[11] = jpegJS.decode(raw_on_11).data;
+const raw_on_12 = fs.readFileSync(path.resolve(__dirname, `pallete/on/12_${streamDeck.ICON_SIZE}.jpg`));
+array_on[12] = jpegJS.decode(raw_on_12).data;
+const raw_on_13 = fs.readFileSync(path.resolve(__dirname, `pallete/on/13_${streamDeck.ICON_SIZE}.jpg`));
+array_on[13] = jpegJS.decode(raw_on_13).data;
+const raw_on_14 = fs.readFileSync(path.resolve(__dirname, `pallete/on/14_${streamDeck.ICON_SIZE}.jpg`));
+array_on[14] = jpegJS.decode(raw_on_14).data;
+const raw_on_15 = fs.readFileSync(path.resolve(__dirname, `pallete/on/15_${streamDeck.ICON_SIZE}.jpg`));
+array_on[15] = jpegJS.decode(raw_on_15).data;
+
 
 if (bwing == 0) {
     var rawButtonBWS = fs.readFileSync(path.resolve(__dirname, `fixtures/selectbwing_${streamDeck.ICON_SIZE}.jpg`));
@@ -60,9 +139,10 @@ wing = (streamDeck.KEY_COLUMNS * streamDeck.KEY_ROWS);
 //load and draw select B-wing buttons 0 1 2
 
 
-//set matrix to exec empty (-1)
+//set matrix to exec empty (-1), and matrixc -2 black/none
 for (i = 0; i < wing; i++) {
     ledmatrix[i] = -1;
+    ledmatrixc[i] = -2;
 }
 
 //auto off wallpaper
@@ -95,6 +175,13 @@ if (wallpaper == 1) {
 sleep(1000, function () {
     // executes after one second, and blocks the thread
 });
+
+function findColorIndex(colorName) {
+	const names = ['Black', 'White', 'Red', 'Orange', 'Yellow', 'Fern Green', 'Green', 'Sea Green', 'Cyan', 'Lavender', 'Blue', 'Violet', 'Magenta', 'Pink', 'CTO', 'CTB'];
+	const index = names.indexOf(colorName);
+  
+	return index;
+  }
 
 //interval send data to server function
 function interval() {
@@ -144,6 +231,10 @@ function hexToRgb(hex) {
     const b = parseInt(hex.substring(5, 7), 16);
 
     return [r, g, b];
+}
+
+function rgbToHex(r, g, b) {
+    return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
 }
 
 //set B-wing Buttons key numbers functions
@@ -294,40 +385,117 @@ client.onmessage = function (e) {
 
             if (obj.responseSubType == 3) {
 
+                if (mode == 3) {
+                    button = 0;
+                    for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
 
+                        for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
 
+                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
 
-                button = 0;
-                for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
-
-                    for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
-
-                        if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
-
-                            if (ledmatrix[button] != -1) {
-                                ledmatrix[button] = -1;
-                                streamDeck.fillKeyBuffer(button, imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-                            }
-                        }
-
-                        else if (obj.itemGroups[k].items[i][0].isRun == 1) {
-
-                            if (ledmatrix[button] != 1) {
-                                ledmatrix[button] = 1;
-                                streamDeck.fillKeyBuffer(button, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-                            }
-                        }
-
-                        else {
-
-                            if (ledmatrix[button] != 0) {
-                                ledmatrix[button] = 0;
-                                streamDeck.fillKeyBuffer(button, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                if (ledmatrix[button] != -1) {
+                                    ledmatrix[button] = -1;
+                                    streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e))
+                                }
                             }
 
+                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+
+                                if (ledmatrix[button] != 1 || ledmatrixc[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
+                                    ledmatrix[button] = 1;
+                                    var c = findColorIndex(obj.itemGroups[k].items[i][0].tt.t);
+                                    ledmatrixc[button] = c;
+                                    if (c == -1){
+                                        c = 0;
+                                    }
+                                    streamDeck.fillKeyBuffer(button, array_on[c], { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                }
+                            }
+
+                            else {
+
+                                if (ledmatrix[button] != 0 || ledmatrixc[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
+                                    ledmatrix[button] = 0;
+                                    var c = findColorIndex(obj.itemGroups[k].items[i][0].tt.t);
+                                    ledmatrixc[button] = c;
+                                    if (c == -1){
+                                        c = 0;
+                                    }
+                                    streamDeck.fillKeyBuffer(button, array_off[c], { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                }
+                            }
+                            button++;
                         }
-                        button++;
                     }
+
+                } else if (mode == 2) {
+                    button = 0;
+                    for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
+
+                        for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
+
+                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                if (ledmatrix[button] != -1) {
+                                    ledmatrix[button] = -1;
+                                    streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e))
+                                }
+                            }
+
+                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+
+                                if (ledmatrix[button] != 1) {
+                                    ledmatrix[button] = 1;
+                                    streamDeck.fillKeyColor(button, R0, G0, B0).catch((e) => console.error('Fill failed:', e))
+                                }
+                            }
+
+                            else {
+
+                                if (ledmatrix[button] != 0) {
+                                    ledmatrix[button] = 0;
+                                    streamDeck.fillKeyColor(button, R1, G1, B1).catch((e) => console.error('Fill failed:', e))
+                                }
+
+                            }
+                            button++;
+                        }
+                    }
+
+                } else {
+                    button = 0;
+                    for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
+
+                        for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
+
+                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                if (ledmatrix[button] != -1) {
+                                    ledmatrix[button] = -1;
+                                    streamDeck.fillKeyBuffer(button, imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                }
+                            }
+
+                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+
+                                if (ledmatrix[button] != 1) {
+                                    ledmatrix[button] = 1;
+                                    streamDeck.fillKeyBuffer(button, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                }
+                            }
+
+                            else {
+
+                                if (ledmatrix[button] != 0) {
+                                    ledmatrix[button] = 0;
+                                    streamDeck.fillKeyBuffer(button, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                }
+
+                            }
+                            button++;
+                        }
+                    }
+
                 }
             }
 
@@ -337,3 +505,47 @@ client.onmessage = function (e) {
         }
     }
 };
+
+
+
+
+/*                for (k = 0; k < 6; k++) {
+            for (i = 0; i < 8; i++) {
+                keyNr = (wing - i - k - 1);
+                console.log(keyNr);
+                if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+                    streamDeck.fillKeyBuffer( 2 , imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                } else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+                    streamDeck.fillKeyBuffer( 2 , imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                } else {
+                    streamDeck.fillKeyBuffer( 2 , imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                }
+        }
+    }
+*/
+
+
+                //console.log(obj.itemGroups[0].items[0][0].i.c);
+
+                /*
+                var hexColor = (obj.itemGroups[0].items[0][0].bdC);
+                const [r, g, b] = hexToRgb(hexColor);
+                //console.log(`RGB: ${r}, ${g}, ${b}`);
+                streamDeck.fillKeyColor(0, r, g, b).catch((e) => console.error('Fill failed:', e));
+                */
+
+
+
+
+                /*
+                                const [r, g, b] = hexToRgb(hexColor);
+                
+                                if (obj.itemGroups[0].items[0][0].isRun == 1) {
+                                    streamDeck.fillKeyBuffer(0, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
+                                } else {
+                                    streamDeck.fillKeyBuffer(0, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e))
+                                }
+                */
+
+                //console.log(streamDeck.KEY_COLUMNS);
+                //console.log(streamDeck.KEY_ROWS);
