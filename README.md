@@ -33,8 +33,14 @@ node dot2elgatostreamdeck.js
 
 ------------
 beta
+1.1.38 Add color mode 2 & color icons
 
-1.0.2 Public
+//CONFIG
+
+var mode = 3;  //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
+
+
+--------------------------------------------------------------------------------
 
 1.0.36 Add select B-wing
 
@@ -47,6 +53,6 @@ var Page = 1;       //Set Page nr (start)
 
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 
-//END-------------------------------
+//END----------------------------------------------------------------------------
 
-...
+1.0.2 Public
