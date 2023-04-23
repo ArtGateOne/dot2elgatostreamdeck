@@ -24,7 +24,7 @@ Store some exec on bwing2 page 1 (left up)
 
 
 
---------- when error
+- when error
 
 run from command prompt (win+R - cmd)
 
@@ -33,8 +33,17 @@ node dot2elgatostreamdeck.js
 
 ------------
 
-work in progress (page select buttons ...)
+beta
+1.1.73 Add Page select buttons (default is off), and brightness
 
+//CONFIG
+
+var brightness = 30;//Set display brightness 1-100
+
+var pageselect = 1; //Select page button 1=ON , 0=OFF
+
+
+------------------------------------------------
 
 beta
 1.1.38 Add color mode (mode 2) & color icons (mode 3)
@@ -48,7 +57,6 @@ var mode = 3;  //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - ic
 
 1.0.36 Add select B-wing
 
-
 //CONFIG
 
 var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
@@ -57,6 +65,6 @@ var Page = 1;       //Set Page nr (start)
 
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 
-//END----------------------------------------------------------------------------
+----------------------------------------------------------------------------
 
 1.0.2 Public
