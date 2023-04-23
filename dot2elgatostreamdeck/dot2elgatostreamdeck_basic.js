@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.0.43
+//dot2elgatestreamdeck beta v.1.0.45
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -10,11 +10,9 @@ const jpegJS = require('jpeg-js');
 const { openStreamDeck } = require('@elgato-stream-deck/node');
 
 
-
 //CONFIG
 var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var Page = 1;       //Set Page nr (start)
-var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 //END-------------------------------
 
 
@@ -22,7 +20,6 @@ var request = -2;
 var session = 0;
 var wing = 0;
 var pageIndex = (Page - 1);
-var colorpage = 5;  //not used - color palete page
 var button = 0;
 var buttons = [0, 1, 2];
 var ledmatrix = [-1, -1, -1];
@@ -37,12 +34,13 @@ const imgExecOn = jpegJS.decode(rawExecOn).data;
 const rawExecOff = fs.readFileSync(path.resolve(__dirname, `fixtures/ExecOff_${streamDeck.ICON_SIZE}.jpg`));        //Exec OFF icon
 const imgExecOff = jpegJS.decode(rawExecOff).data;
 
+//load and draw select B-wing buttons 0 1 2
 if (bwing == 0) {
-    var rawButtonBWS = fs.readFileSync(path.resolve(__dirname, `fixtures/selectbwing_${streamDeck.ICON_SIZE}.jpg`));
+    var rawButtonBWS = fs.readFileSync(path.resolve(__dirname, `fixtures/ask_${streamDeck.ICON_SIZE}.jpg`));
     var imgButtonBWS = jpegJS.decode(rawButtonBWS).data;
-    var rawButtonBW1 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing1_${streamDeck.ICON_SIZE}.jpg`));
+    var rawButtonBW1 = fs.readFileSync(path.resolve(__dirname, `fixtures/1_${streamDeck.ICON_SIZE}.jpg`));
     var imgButtonBW1 = jpegJS.decode(rawButtonBW1).data;
-    var rawButtonBW2 = fs.readFileSync(path.resolve(__dirname, `fixtures/bwing2_${streamDeck.ICON_SIZE}.jpg`));
+    var rawButtonBW2 = fs.readFileSync(path.resolve(__dirname, `fixtures/2_${streamDeck.ICON_SIZE}.jpg`));
     var imgButtonBW2 = jpegJS.decode(rawButtonBW2).data;
 
     streamDeck.fillKeyBuffer(0, imgButtonBWS, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
@@ -57,39 +55,11 @@ if (bwing == 0) {
 //stream deck no buttons
 wing = (streamDeck.KEY_COLUMNS * streamDeck.KEY_ROWS);
 
-//load and draw select B-wing buttons 0 1 2
-
-
 //set matrix to exec empty (-1)
 for (i = 0; i < wing; i++) {
     ledmatrix[i] = -1;
 }
 
-//auto off wallpaper
-if (bwing == 0) {
-    wallpaper = 0;    //<------------- set to 1 - auto off wallpaper (select bwing boot)
-    var buttons = [0, 0, 0];
-}
-
-//wallpaper
-if (wallpaper == 1) {
-    ; (async () => {
-        //const streamDeck = openStreamDeck()
-        //await streamDeck.clearPanel()
-
-        const image = await sharp(path.resolve(__dirname, 'fixtures/dot2.png'))
-            .flatten()
-            .resize(streamDeck.ICON_SIZE * streamDeck.KEY_COLUMNS, streamDeck.ICON_SIZE * streamDeck.KEY_ROWS)
-            .raw()
-            .toBuffer()
-
-        streamDeck.fillPanelBuffer(image).catch((e) => console.error('Fill failed:', e))
-
-        streamDeck.on('error', (error) => {
-            console.error(error)
-        })
-    })()
-}
 
 //sleep function
 sleep(1000, function () {
