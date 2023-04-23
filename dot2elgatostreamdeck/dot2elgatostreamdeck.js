@@ -15,7 +15,7 @@ var page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 var mode = 3;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
 var brightness = 30;//Set display brightness 1-100
-var pageselect = 1; //Select page button 1=ON , 0=OFF
+var pageselect = 0; //Select page button 1=ON , 0=OFF
 
 //Colors - 0 off, 1 on
 var R0 = 255;
