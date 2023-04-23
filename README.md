@@ -1,7 +1,7 @@
 # dot2elgatostreamdeck
 
 
-nodejs code to control dot2 software use elgato stream deck controller
+nodejs code to control dot2 software use elgato stream deck controller 6, 15 or 32 buttons
 
 Download and instal NODEJS version 14.17 from https://nodejs.org/dist/v14.17.0/node-v14.17.0-x64.msi
 
@@ -32,8 +32,12 @@ node dot2elgatostreamdeck.js
 
 
 ------------
+
+work in progress (page select buttons ...)
+
+
 beta
-1.1.38 Add color mode 2 & color icons
+1.1.38 Add color mode (mode 2) & color icons (mode 3)
 
 //CONFIG
 
