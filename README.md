@@ -36,6 +36,7 @@ beta 1.2.88
 
 Add display mode 4 - orginal icons + Exec Names & cue
 
+<-
 
 beta
 1.1.73 Add Page select buttons (default is off), and brightness
@@ -46,7 +47,7 @@ var brightness = 30;//Set display brightness 1-100
 
 var pageselect = 1; //Select page button 1=ON , 0=OFF
 
-
+<-
 
 beta
 1.1.38 Add color mode (mode 2) & color icons (mode 3)
@@ -55,7 +56,7 @@ beta
 
 var mode = 3;  //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
 
-
+<-
 
 1.0.36 Add select B-wing
 
@@ -67,6 +68,6 @@ var Page = 1;       //Set Page nr (start)
 
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF
 
-
+<-
 
 1.0.2 Public
