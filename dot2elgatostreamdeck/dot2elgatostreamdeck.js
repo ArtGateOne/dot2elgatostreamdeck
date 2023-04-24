@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.1.73
+//dot2elgatestreamdeck beta v.1.2.88
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -12,12 +12,14 @@ const { openStreamDeck } = require('@elgato-stream-deck/node');
 //CONFIG
 var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var page = 1;       //Set Page nr (start)
-var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
-var mode = 3;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
-var brightness = 30;//Set display brightness 1-100
+var wallpaper = 0;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
+var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name)
+var brightness = 40;//Set display brightness 1-100
 var pageselect = 0; //Select page button 1=ON , 0=OFF
 
-//Colors - 0 off, 1 on
+
+
+//Colors - 0 off, 1 on (mode 2)
 var R0 = 255;
 var G0 = 127;
 var B0 = 0;
@@ -31,12 +33,13 @@ var session = 0;
 var wing = 0;
 var button = 0;
 var buttons = [0, 1, 2];
-var ledmatrix = [-1, -1, -1];
-var ledmatrixc = [-2, -2, -2];
+var ledmatrix = [-1, -1, -1];   //IS RUN / ON OFF
+var ledmatrix_en = [-2, -2, -2];  //exec name
+var ledmatrix_cn = [];            //cue name
+var ledmatrix_t = [];            //type
 var array_off = [];
 var array_on = [];
 pageIndex = (page - 1);
-
 
 const streamDeck = openStreamDeck();
 streamDeck.clearPanel();
@@ -185,20 +188,18 @@ if (pageselect == 1) {
 //set matrix to exec empty (-1), and matrixc -2 black/none
 for (i = 0; i < wing; i++) {
     ledmatrix[i] = -1;
-    ledmatrixc[i] = -2;
+    ledmatrix_en[i] = -2;
 }
 
 //auto off wallpaper
 if (bwing == 0) {
-    wallpaper = 0;    //<------------- set to 1 - auto off wallpaper (select bwing boot)
+    wallpaper = 0;
     var buttons = [0, 0, 0];
 }
 
 //wallpaper
 if (wallpaper == 1) {
     ; (async () => {
-        //const streamDeck = openStreamDeck()
-        //await streamDeck.clearPanel()
 
         const image = await sharp(path.resolve(__dirname, 'fixtures/dot2.png'))
             .flatten()
@@ -214,8 +215,84 @@ if (wallpaper == 1) {
     })()
 }
 
-function PageIcon(){
-    if (pageIndex == 0){
+
+
+
+//generate_icon(exec_color, is_run, exec_name, exec_type, cue_name, button)
+async function generate_icon(exec_color, is_run, exec_name, exec_type, cue_name, button) {
+
+    //console.log(exec_color, is_run, exec_name, exec_type, cue_name, button);
+
+    try {
+        const finalBuffer2 = await sharp(path.resolve(__dirname, `images/${exec_type}.png`))
+            //.resize(streamDeck.ICON_SIZE / 3)
+            //.flatten({ background: exec_color })
+            //.flatten()
+            .toBuffer()
+
+        //overlayWith(image, { top: Number, left: Number })
+
+        const finalBuffer = await sharp({
+            create: {
+                width: streamDeck.ICON_SIZE,
+                height: streamDeck.ICON_SIZE,
+                channels: 4,
+                background: exec_color,
+            }
+        })
+            .composite([
+                {
+                    input: Buffer.from(
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.ICON_SIZE} ${streamDeck.ICON_SIZE
+                        }" version="1.1">
+                    <text
+                    font-family="'Arial'"
+                        font-size="10px"
+                        x="${streamDeck.ICON_SIZE / 2}"
+                        y="${20}"
+                        fill="#fff"
+                        text-anchor="middle"
+                        >${exec_name}</text>
+                </svg>`
+                    ),
+                    top: 0,
+                    left: 0,
+                },
+                {
+                    input: Buffer.from(finalBuffer2),
+
+                },
+                {
+                    input: Buffer.from(
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${streamDeck.ICON_SIZE} ${streamDeck.ICON_SIZE
+                        }" version="1.1">
+                    <text
+                        font-family="'Arial'"
+                        font-size="10px"
+                        font-weight="bold"
+                        x="${streamDeck.ICON_SIZE / 2}"
+                        y="${streamDeck.ICON_SIZE - 12}"
+                        fill="#fff"
+                        text-anchor="middle"
+                        >${cue_name}</text>
+                </svg>`
+                    ),
+                    top: 0,
+                    left: 0,
+                },
+            ])
+
+            .flatten({ background: exec_color })
+            .raw()
+            .toBuffer()
+        await streamDeck.fillKeyBuffer(button, finalBuffer, { format: 'rgba' })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+function PageIcon() {
+    if (pageIndex == 0) {
         streamDeck.fillKeyBuffer(streamDeck.KEY_COLUMNS, imgButton1, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
     }
 
@@ -233,8 +310,8 @@ function PageIcon(){
 
     else if (pageIndex == 4) {
         streamDeck.fillKeyBuffer(streamDeck.KEY_COLUMNS, imgButton5, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-    } 
-    
+    }
+
     else {
         streamDeck.fillKeyBuffer(streamDeck.KEY_COLUMNS, imgButtonAsk, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
     }
@@ -323,7 +400,9 @@ function hexToRgb(hex) {
     return [r, g, b];
 }
 
+//rgbtohex
 function rgbToHex(r, g, b) {
+
     return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
 }
 
@@ -396,12 +475,12 @@ streamDeck.on('up', (keyIndex) => {
             bwing = keyIndex;
             setBwingButtons();
         }
-    } 
-    
+    }
+
     else if (pageselect == 1 & keyIndex == 0 || pageselect == 1 & wing == 6 & keyIndex == 3 || pageselect == 1 & wing == 15 & keyIndex == 5 || pageselect == 1 & wing == 15 & keyIndex == 10 || pageselect == 1 & wing == 32 & keyIndex == 8 || pageselect == 1 & wing == 32 & keyIndex == 16 || pageselect == 1 & wing == 32 & button == 24) {
         //do nothing
     }
-    
+
     else {
         client.send('{"requestType":"playbacks_userInput","cmdline":"","execIndex":' + buttons[keyIndex] + ',"pageIndex":' + pageIndex + ',"buttonId":0,"pressed":false,"released":true,"type":0,"session":' + session + ',"maxRequests":0}');
     }
@@ -492,8 +571,8 @@ client.onmessage = function (e) {
                 console.log("Please turn on Web Remote, and set Web Remote password to \"remote\"");
                 streamDeck.clearPanel();
                 process.exit();
-            } 
-            
+            }
+
             else {
                 session = (obj.session);
             }
@@ -513,9 +592,80 @@ client.onmessage = function (e) {
 
         else if (obj.responseType == "playbacks") {
 
-            if (obj.responseSubType == 3) {
+            if (obj.responseSubType == 3) {//Executors
 
-                if (mode == 3) {
+                if (mode == 4) {
+
+                    button = 0;
+                    for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
+
+                        for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
+
+                            //console.log("Button " + button);
+
+                            if (pageselect == 1 & button == 0 || pageselect == 1 & wing == 6 & button == 3 || pageselect == 1 & wing == 15 & button == 5 || pageselect == 1 & wing == 15 & button == 10 || pageselect == 1 & wing == 32 & button == 8 || pageselect == 1 & wing == 32 & button == 16 || pageselect == 1 & wing == 32 & button == 24) { } else {
+
+                                if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                    if (ledmatrix[button] != -1) {
+                                        ledmatrix[button] = -1;
+                                        streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e))
+                                    }
+                                }
+
+                                else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+
+                                    //generate_icon(exec_color, is_run, exec_name, exec_type, cue_name, button)
+                                    //is run    ledmatrix[button] = obj.itemGroups[k].items[i][0].isRun
+                                    //exec_name ledmatrix_en[button] = obj.itemGroups[k].items[i][0].tt.t
+                                    //exec_type ledmatrix_t[button] = obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t
+                                    //cue_name  ledmatrix_cn[button] = obj.itemGroups[k].items[i][0].cues.items[0].t
+                                    //button
+
+
+                                    if (ledmatrix[button] != 1 || ledmatrix_en[button] != (obj.itemGroups[k].items[i][0].tt.t) || ledmatrix_t[button] != (obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t) || ledmatrix_cn[button] != (obj.itemGroups[k].items[i][0].cues.items[0].t)) {
+
+                                        ledmatrix[button] = 1;
+                                        ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                        ledmatrix_t[button] = (obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t);
+                                        ledmatrix_cn[button] = (obj.itemGroups[k].items[i][0].cues.items[0].t);
+
+                                        if (typeof (obj.itemGroups[k].items[i][0].cues.items[1]) != "undefined") {
+                                            var cue_name = (obj.itemGroups[k].items[i][0].cues.items[1].t);
+                                        } else {
+                                            var cue_name = (obj.itemGroups[k].items[i][0].cues.items[0].t);
+                                        }
+                                        if ((obj.itemGroups[k].items[i][0].cues.bC) == "#203F3F") {//If chaser - display BPM
+                                            cue_name = (obj.itemGroups[k].items[i][0].cues.items[0].t);
+                                        }
+
+                                        generate_icon(obj.itemGroups[k].items[i][0].cues.bC, obj.itemGroups[k].items[i][0].isRun, obj.itemGroups[k].items[i][0].tt.t, obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t, cue_name, button);
+
+                                    }
+                                }
+
+                                else {
+
+                                    if (ledmatrix[button] != 0 || ledmatrix_en[button] != (obj.itemGroups[k].items[i][0].tt.t) || ledmatrix_t[button] != (obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t) || ledmatrix_cn[button] != (obj.itemGroups[k].items[i][0].cues.items[0].t)) {
+
+                                        ledmatrix[button] = 0;
+                                        ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                        ledmatrix_t[button] = (obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t);
+                                        ledmatrix_cn[button] = (obj.itemGroups[k].items[i][0].cues.items[0].t);
+
+                                        cue_name = "";
+
+                                        generate_icon('#000000', obj.itemGroups[k].items[i][0].isRun, obj.itemGroups[k].items[i][0].tt.t, obj.itemGroups[k].items[i][0].bottomButtons.items[0].n.t, cue_name, button);
+
+                                    }
+                                }
+                            }
+                            button++;
+                        }
+                    }
+                }
+
+                else if (mode == 3) {
                     button = 0;
                     for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
 
@@ -533,10 +683,10 @@ client.onmessage = function (e) {
 
                                 else if (obj.itemGroups[k].items[i][0].isRun == 1) {
 
-                                    if (ledmatrix[button] != 1 || ledmatrixc[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
+                                    if (ledmatrix[button] != 1 || ledmatrix_en[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
                                         ledmatrix[button] = 1;
                                         var c = findColorIndex(obj.itemGroups[k].items[i][0].tt.t);
-                                        ledmatrixc[button] = c;
+                                        ledmatrix_en[button] = c;
 
                                         if (c == -1) {
                                             c = 0;
@@ -548,10 +698,10 @@ client.onmessage = function (e) {
 
                                 else {
 
-                                    if (ledmatrix[button] != 0 || ledmatrixc[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
+                                    if (ledmatrix[button] != 0 || ledmatrix_en[button] != (findColorIndex(obj.itemGroups[k].items[i][0].tt.t))) {
                                         ledmatrix[button] = 0;
                                         var c = findColorIndex(obj.itemGroups[k].items[i][0].tt.t);
-                                        ledmatrixc[button] = c;
+                                        ledmatrix_en[button] = c;
 
                                         if (c == -1) {
                                             c = 0;
@@ -564,10 +714,10 @@ client.onmessage = function (e) {
                             button++;
                         }
                     }
-                } 
-                
+                }
+
                 else if (mode == 2) {
-                    
+
                     button = 0;
                     for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
 
@@ -603,8 +753,8 @@ client.onmessage = function (e) {
                         }
                     }
 
-                } 
-                
+                }
+
                 else {
                     button = 0;
                     for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
@@ -640,8 +790,8 @@ client.onmessage = function (e) {
                 }
             }
 
-            if (obj.responseSubType == 2) {
-
+            if (obj.responseSubType == 2) {//Faders
+                //none
             }
         }
     }
