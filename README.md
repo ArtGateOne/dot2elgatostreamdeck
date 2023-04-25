@@ -58,7 +58,7 @@ var pageselect = 0; //Select page button 1=ON , 0=OFF
 
 EXTRA - in mode 3
 
-Change Your executor to name Red, Yellow, Sea Green - icon change bacground color.
+Change Your executor name to Red, Yellow, Sea Green - icon change bacground color.
 
 
 
