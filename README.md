@@ -37,16 +37,24 @@ EXTRA
 Open .js file in notepad ad find //CONFIG to make some changes
 
 //CONFIG
+
 var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
+
 var page = 1;       //Set Page nr (start)
+
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
+
 var mode =1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2)
+
 var brightness = 40;//Set display brightness 1-100
+
 var pageselect = 0; //Select page button 1=ON , 0=OFF
 
 
 ----
+
 ----
+
 
 EXTRA - in mode 3
 
