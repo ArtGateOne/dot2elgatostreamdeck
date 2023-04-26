@@ -60,10 +60,34 @@ EXTRA - in mode 3
 
 Change Your executor name to Red, Yellow, Sea Green - icon change bacground color.
 
+EXTRA - in mode 5
 
+Rename executor to Center, Straight, Up Fan Out (all icons in MyIcons)
 
 
 ------------
+Beta 1.3.35
+
+Add custom icons mode (mode 5)
+
+Custom icons in MyIcons folder
+
+Format PNG (best 96x96)
+
+
+U can add custom icons to MyIcons folder (best size 96x96) .png
+
+Rename Executor to file name (without .png) ex Sequ.png <--- is default executor name (empty), or Red , Yellow, Blind :D
+
+U can try now - rename executor to Center, Straight, Up Fan Out...
+
+to test
+
+Have fun!
+
+
+<-
+
 beta 1.2.88
 
 Add display mode 4 - orginal icons + Exec Names & cue
