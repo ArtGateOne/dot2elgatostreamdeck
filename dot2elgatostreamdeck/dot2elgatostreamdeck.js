@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.2.88
+//dot2elgatestreamdeck beta v.1.3.35
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -12,12 +12,10 @@ const { openStreamDeck } = require('@elgato-stream-deck/node');
 //CONFIG
 var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var page = 1;       //Set Page nr (start)
-var wallpaper = 0;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
-var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2)
+var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
+var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
 var brightness = 40;//Set display brightness 1-100
 var pageselect = 0; //Select page button 1=ON , 0=OFF
-
-
 
 //Colors - 0 off, 1 on (mode 2)
 var R0 = 255;
@@ -215,6 +213,111 @@ if (wallpaper == 1) {
     })()
 }
 
+//MyIcon(button,ledmatrix,ledmatrix_En)
+async function MyIcon(button, is_run, exec_name) {
+
+    if (is_run == 1) {
+
+        if (fs.existsSync(path.resolve(__dirname, `MyIcons/${(exec_name)}.png`))) {
+
+            try {
+
+                var finalBuffer = await sharp(path.resolve(__dirname, `MyIcons/${exec_name}.png`))
+                    .flatten()
+                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                    .raw()
+                    .toBuffer()
+
+                streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+            }
+
+            catch (error) {
+                console.error(error)
+            }
+        }
+
+        else {
+
+            try {
+
+                var finalBuffer = await sharp(path.resolve(__dirname, `images/ma_logo.png`))
+                    .flatten()
+                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                    .raw()
+                    .toBuffer()
+
+                streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+            }
+            catch (error) {
+                console.error(error)
+            }
+        }
+    }
+
+    else {
+
+        if (fs.existsSync(path.resolve(__dirname, `MyIcons/${(exec_name)}.png`))) {
+
+            try {
+
+                var finalBuffer = await sharp(path.resolve(__dirname, `MyIcons/${exec_name}.png`))
+                    .modulate({
+                        brightness: 0.3,
+
+                    })
+                    .flatten()
+                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                    .raw()
+                    .toBuffer()
+
+                streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+            }
+
+            catch (error) {
+                console.error(error)
+            }
+        }
+
+        else {
+            /*
+                    else {
+ 
+            try {
+ 
+                var finalBuffer = await sharp(path.resolve(__dirname, `images/ma_logo_checked.png`))
+                    .flatten()
+                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                    .raw()
+                    .toBuffer()
+            
+                    streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+            }
+            
+            catch (error) {
+                console.error(error)
+            }
+        }
+            */
+
+            try {
+
+                var finalBuffer = await sharp(path.resolve(__dirname, `images/ma_logo_checked.png`))
+                    .flatten()
+                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                    .raw()
+                    .toBuffer()
+
+                streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+            }
+
+            catch (error) {
+                console.error(error)
+            }
+        }
+    }
+
+}
+
 
 
 
@@ -286,7 +389,11 @@ async function generate_icon(exec_color, is_run, exec_name, exec_type, cue_name,
             .raw()
             .toBuffer()
         await streamDeck.fillKeyBuffer(button, finalBuffer, { format: 'rgba' })
-    } catch (error) {
+
+    }
+
+    catch (error) {
+
         console.error(error)
     }
 }
@@ -594,7 +701,43 @@ client.onmessage = function (e) {
 
             if (obj.responseSubType == 3) {//Executors
 
-                if (mode == 4) {
+                if (mode == 5) {
+                    button = 0;
+                    for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
+
+                        for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
+
+                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                if (ledmatrix[button] != -1) {
+                                    ledmatrix[button] = -1;
+                                    streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e));
+                                }
+                            }
+
+                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+                                //ledmatrix_en[button] = obj.itemGroups[k].items[i][0].tt.t
+
+                                if (ledmatrix[button] != 1 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
+                                    ledmatrix[button] = 1;
+                                    ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                    MyIcon(button, 1, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                }
+                            }
+
+                            else {
+
+                                if (ledmatrix[button] != 0 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
+                                    ledmatrix[button] = 0;
+                                    ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                    MyIcon(button, 0, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                }
+                            }
+                            button++;
+                        }
+                    }
+                }
+                else if (mode == 4) {
 
                     button = 0;
                     for (k = 0; k <= (streamDeck.KEY_ROWS - 1); k++) {
