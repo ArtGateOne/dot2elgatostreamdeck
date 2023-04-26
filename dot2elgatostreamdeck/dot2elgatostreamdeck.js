@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.3.35
+//dot2elgatestreamdeck beta v.1.3.52
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -14,7 +14,7 @@ var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
-var brightness = 40;//Set display brightness 1-100
+var brightness = 35;//Set display brightness 1-100
 var pageselect = 0; //Select page button 1=ON , 0=OFF
 
 //Colors - 0 off, 1 on (mode 2)
@@ -707,30 +707,34 @@ client.onmessage = function (e) {
 
                         for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
 
-                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+                            if (pageselect == 1 & button == 0 || pageselect == 1 & wing == 6 & button == 3 || pageselect == 1 & wing == 15 & button == 5 || pageselect == 1 & wing == 15 & button == 10 || pageselect == 1 & wing == 32 & button == 8 || pageselect == 1 & wing == 32 & button == 16 || pageselect == 1 & wing == 32 & button == 24) { } else {
 
-                                if (ledmatrix[button] != -1) {
-                                    ledmatrix[button] = -1;
-                                    streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e));
+
+                                if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                    if (ledmatrix[button] != -1) {
+                                        ledmatrix[button] = -1;
+                                        streamDeck.clearKey(button).catch((e) => console.error('Clear failed:', e));
+                                    }
                                 }
-                            }
 
-                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
-                                //ledmatrix_en[button] = obj.itemGroups[k].items[i][0].tt.t
+                                else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+                                    //ledmatrix_en[button] = obj.itemGroups[k].items[i][0].tt.t
 
-                                if (ledmatrix[button] != 1 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
-                                    ledmatrix[button] = 1;
-                                    ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
-                                    MyIcon(button, 1, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                    if (ledmatrix[button] != 1 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
+                                        ledmatrix[button] = 1;
+                                        ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                        MyIcon(button, 1, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                    }
                                 }
-                            }
 
-                            else {
+                                else {
 
-                                if (ledmatrix[button] != 0 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
-                                    ledmatrix[button] = 0;
-                                    ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
-                                    MyIcon(button, 0, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                    if (ledmatrix[button] != 0 || ledmatrix_en[button] !== obj.itemGroups[k].items[i][0].tt.t) {
+                                        ledmatrix[button] = 0;
+                                        ledmatrix_en[button] = (obj.itemGroups[k].items[i][0].tt.t);
+                                        MyIcon(button, 0, (obj.itemGroups[k].items[i][0].tt.t));//MyIcon(button,ledmatrix,ledmatrix_En)
+                                    }
                                 }
                             }
                             button++;
@@ -904,27 +908,30 @@ client.onmessage = function (e) {
 
                         for (i = (streamDeck.KEY_COLUMNS - 1); i >= 0; i--) {
 
-                            if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+                            if (pageselect == 1 & button == 0 || pageselect == 1 & wing == 6 & button == 3 || pageselect == 1 & wing == 15 & button == 5 || pageselect == 1 & wing == 15 & button == 10 || pageselect == 1 & wing == 32 & button == 8 || pageselect == 1 & wing == 32 & button == 16 || pageselect == 1 & wing == 32 & button == 24) { } else {
 
-                                if (ledmatrix[button] != -1) {
-                                    ledmatrix[button] = -1;
-                                    streamDeck.fillKeyBuffer(button, imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                if ((obj.itemGroups[k].items[i][0].i.c) == "#000000") {
+
+                                    if (ledmatrix[button] != -1) {
+                                        ledmatrix[button] = -1;
+                                        streamDeck.fillKeyBuffer(button, imgExecEmpty, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                    }
                                 }
-                            }
 
-                            else if (obj.itemGroups[k].items[i][0].isRun == 1) {
+                                else if (obj.itemGroups[k].items[i][0].isRun == 1) {
 
-                                if (ledmatrix[button] != 1) {
-                                    ledmatrix[button] = 1;
-                                    streamDeck.fillKeyBuffer(button, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                    if (ledmatrix[button] != 1) {
+                                        ledmatrix[button] = 1;
+                                        streamDeck.fillKeyBuffer(button, imgExecOn, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                    }
                                 }
-                            }
 
-                            else {
+                                else {
 
-                                if (ledmatrix[button] != 0) {
-                                    ledmatrix[button] = 0;
-                                    streamDeck.fillKeyBuffer(button, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                    if (ledmatrix[button] != 0) {
+                                        ledmatrix[button] = 0;
+                                        streamDeck.fillKeyBuffer(button, imgExecOff, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+                                    }
                                 }
                             }
                             button++;
