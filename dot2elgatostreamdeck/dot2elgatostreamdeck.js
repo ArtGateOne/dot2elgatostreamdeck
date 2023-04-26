@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.3.52
+//dot2elgatestreamdeck beta v.1.3.55
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -10,7 +10,7 @@ const jpegJS = require('jpeg-js');
 const { openStreamDeck } = require('@elgato-stream-deck/node');
 
 //CONFIG
-var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
+var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var page = 1;       //Set Page nr (start)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
@@ -258,23 +258,44 @@ async function MyIcon(button, is_run, exec_name) {
 
         if (fs.existsSync(path.resolve(__dirname, `MyIcons/${(exec_name)}.png`))) {
 
-            try {
+            if (fs.existsSync(path.resolve(__dirname, `MyIcons/${(exec_name)}_Off.png`))) {
+                try {
 
-                var finalBuffer = await sharp(path.resolve(__dirname, `MyIcons/${exec_name}.png`))
-                    .modulate({
-                        brightness: 0.3,
+                    var finalBuffer = await sharp(path.resolve(__dirname, `MyIcons/${exec_name}_Off.png`))
+                        .flatten()
+                        .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                        .raw()
+                        .toBuffer()
 
-                    })
-                    .flatten()
-                    .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-                    .raw()
-                    .toBuffer()
+                    streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+                }
 
-                streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+                catch (error) {
+                    console.error(error)
+                }
+
             }
 
-            catch (error) {
-                console.error(error)
+            else {
+
+                try {
+
+                    var finalBuffer = await sharp(path.resolve(__dirname, `MyIcons/${exec_name}.png`))
+                        .modulate({
+                            brightness: 0.3,
+
+                        })
+                        .flatten()
+                        .resize(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
+                        .raw()
+                        .toBuffer()
+
+                    streamDeck.fillKeyBuffer(button, finalBuffer).catch((e) => console.error('Fill failed:', e))
+                }
+
+                catch (error) {
+                    console.error(error)
+                }
             }
         }
 
