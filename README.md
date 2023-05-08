@@ -44,7 +44,7 @@ var page = 1;       //Set Page nr (start)
 
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 
-var mode =1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2)
+var mode =1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
 
 var brightness = 40;//Set display brightness 1-100
 
