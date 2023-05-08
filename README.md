@@ -66,6 +66,15 @@ Rename executor to Center, Straight, Up Fan Out (all icons in MyIcons)
 
 
 ------------
+Beta 1.3.38 
+
+Fix 501 Exec
+
+Add new iconc mode 5 - colors and prism
+
+
+<-
+
 Beta 1.3.35
 
 Add custom icons mode (mode 5)
