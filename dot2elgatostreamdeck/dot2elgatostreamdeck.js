@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.3.58
+//dot2elgatestreamdeck beta v.1.4.0
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -10,8 +10,8 @@ const jpegJS = require('jpeg-js');
 const { openStreamDeck } = require('@elgato-stream-deck/node');
 
 //CONFIG
-var bwing = 0;      //select B-wing 1 or 2, or set 0 - to on boot screen select
-var page = 1;       //Set Page nr (start)
+var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
+var page = 1;       //Set Page nr (start 1 - 5)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
 var brightness = 35;//Set display brightness 1-100
@@ -165,7 +165,8 @@ if (pageselect == 1) {
     if (wing == 32) {
 
         streamDeck.fillKeyBuffer(16, img_page_minus, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
-        streamDeck.fillKeyBuffer(8, imgButton1, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+        PageIcon();
+        BWingIcon();
     }
 
     else if (wing == 15) {
@@ -447,6 +448,18 @@ function PageIcon() {
     return;
 }
 
+function BWingIcon() {
+    if (bwing == 1 && wing == 32) {
+        streamDeck.fillKeyBuffer(24, imgButton1, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+    }
+
+    else if (bwing == 2 && wing == 32) {
+        streamDeck.fillKeyBuffer(24, imgButton2, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+    }
+
+    return;
+}
+
 //sleep function
 sleep(1000, function () {
     // executes after one second, and blocks the thread
@@ -565,7 +578,7 @@ streamDeck.on('down', (keyIndex) => {
         //nothing
     }
 
-    else if (pageselect == 1 && keyIndex == 0 || pageselect == 1 && wing == 6 & keyIndex == 3 || pageselect == 1 && wing == 15 && keyIndex == 5 || pageselect == 1 && wing == 15 && keyIndex == 10 || pageselect == 1 && wing == 32 && keyIndex == 8 || pageselect == 1 && wing == 32 && keyIndex == 16 || pageselect == 1 && wing == 32 && button == 24) {
+    else if (pageselect == 1 && keyIndex == 0 || pageselect == 1 && wing == 6 & keyIndex == 3 || pageselect == 1 && wing == 15 && keyIndex == 5 || pageselect == 1 && wing == 15 && keyIndex == 10 || pageselect == 1 && wing == 32 && keyIndex == 8 || pageselect == 1 && wing == 32 && keyIndex == 16 || pageselect == 1 && wing == 32 && keyIndex == 24) {
 
         if (keyIndex == 0) {//Page Plus Button
             pageIndex++;
@@ -587,6 +600,18 @@ streamDeck.on('down', (keyIndex) => {
             }
 
         }
+
+        else if (wing == 32 && keyIndex == 24) {
+
+            if (bwing == 1) {
+                bwing = 2;
+            } else if (bwing == 2) {
+                bwing = 1;
+            }
+            console.log("B-wing "+ bwing);
+            setBwingButtons();
+            BWingIcon();
+        }
     }
 
     else {
@@ -602,6 +627,10 @@ streamDeck.on('up', (keyIndex) => {
             console.log("B-wing " + keyIndex);
             bwing = keyIndex;
             setBwingButtons();
+            if (pageselect == 1) {
+                BWingIcon();
+            }
+
         }
     }
 
