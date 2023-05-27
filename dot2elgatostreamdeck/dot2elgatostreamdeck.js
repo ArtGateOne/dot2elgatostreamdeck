@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.4.0
+//dot2elgatestreamdeck beta v.1.4.2
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -14,7 +14,7 @@ var bwing = 2;      //select B-wing 1 or 2, or set 0 - to on boot screen select
 var page = 1;       //Set Page nr (start 1 - 5)
 var wallpaper = 1;  //Wallpaper 1 = ON, 0 = OFF (AutoOff)
 var mode = 1;       //set display mode: 1 - ON/Off icons, 2 - ON/Off 2 colors, 3 - icon + colors (color from executor name), 4 - exec name + icon + cue name (dot2), 5 - custom icons
-var brightness = 35;//Set display brightness 1-100
+var brightness = 40;//Set display brightness 2-100
 var pageselect = 0; //Select page button 1=ON , 0=OFF
 
 //Colors - 0 off, 1 on (mode 2)
@@ -26,6 +26,7 @@ var G1 = 0;
 var B1 = 127;
 //END-------------------------------
 
+var set_brightness = 0;
 var request = -2;
 var session = 0;
 var wing = 0;
@@ -135,6 +136,8 @@ var rawButton4 = fs.readFileSync(path.resolve(__dirname, `fixtures/4_${streamDec
 var imgButton4 = jpegJS.decode(rawButton4).data;
 var rawButton5 = fs.readFileSync(path.resolve(__dirname, `fixtures/5_${streamDeck.ICON_SIZE}.jpg`));
 var imgButton5 = jpegJS.decode(rawButton5).data;
+var rawButtonBrightness = fs.readFileSync(path.resolve(__dirname, `fixtures/brightness_${streamDeck.ICON_SIZE}.jpg`));
+var imgButtonBrightness = jpegJS.decode(rawButtonBrightness).data;
 
 if (brightness > 0) {
     if (brightness > 100) {
@@ -578,25 +581,48 @@ streamDeck.on('down', (keyIndex) => {
         //nothing
     }
 
+    else if (pageselect == 1 && keyIndex == streamDeck.KEY_COLUMNS && wing >= 16) {
+        if (set_brightness == 0) {
+            set_brightness = 1;
+            streamDeck.fillKeyBuffer(streamDeck.KEY_COLUMNS, imgButtonBrightness, { format: 'rgba' }).catch((e) => console.error('Fill failed:', e));
+        } else {
+            set_brightness = 0;
+            PageIcon();
+        }
+    }
+
     else if (pageselect == 1 && keyIndex == 0 || pageselect == 1 && wing == 6 & keyIndex == 3 || pageselect == 1 && wing == 15 && keyIndex == 5 || pageselect == 1 && wing == 15 && keyIndex == 10 || pageselect == 1 && wing == 32 && keyIndex == 8 || pageselect == 1 && wing == 32 && keyIndex == 16 || pageselect == 1 && wing == 32 && keyIndex == 24) {
 
         if (keyIndex == 0) {//Page Plus Button
-            pageIndex++;
-            if (pageIndex >= 5) {
-                pageIndex = 4;
+            if (set_brightness == 1) {
+                brightness = (brightness + 10 > 100) ? 100 : brightness + 10;
+                console.log("Brightness " + brightness + "%");
+                streamDeck.setBrightness(brightness).catch((e) => console.error('Set brightness failed:', e));
             } else {
-                console.log("Page " + (pageIndex + 1));
-                PageIcon();
+                pageIndex++;
+                if (pageIndex >= 5) {
+                    pageIndex = 4;
+                } else {
+                    console.log("Page " + (pageIndex + 1));
+                    PageIcon();
+                }
             }
+
         }
 
         else if (wing == 6 && keyIndex == 3 || wing == 15 && keyIndex == 10 || wing == 32 && keyIndex == 16) {//Page Minus Button
-            pageIndex--;
-            if (pageIndex < 0) {
-                pageIndex = 0;
+            if (set_brightness == 1) {
+                brightness = (brightness - 10 < 1) ? 2 : brightness - 10;
+                console.log("Brightness " + brightness + "%");
+                streamDeck.setBrightness(brightness).catch((e) => console.error('Set brightness failed:', e));
             } else {
-                console.log("Page " + (pageIndex + 1));
-                PageIcon();
+                pageIndex--;
+                if (pageIndex < 0) {
+                    pageIndex = 0;
+                } else {
+                    console.log("Page " + (pageIndex + 1));
+                    PageIcon();
+                }
             }
 
         }
@@ -608,7 +634,7 @@ streamDeck.on('down', (keyIndex) => {
             } else if (bwing == 2) {
                 bwing = 1;
             }
-            console.log("B-wing "+ bwing);
+            console.log("B-wing " + bwing);
             setBwingButtons();
             BWingIcon();
         }
