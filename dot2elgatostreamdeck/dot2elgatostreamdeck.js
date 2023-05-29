@@ -1,4 +1,4 @@
-//dot2elgatestreamdeck beta v.1.4.2
+//dot2elgatestreamdeck beta v.1.4.5
 
 var W3CWebSocket = require('websocket')
     .w3cwebsocket;
@@ -28,6 +28,7 @@ var B1 = 127;
 
 var set_brightness = 0;
 var request = -2;
+var interval_on = 0;
 var session = 0;
 var wing = 0;
 var button = 0;
@@ -767,7 +768,10 @@ client.onmessage = function (e) {
         }
 
         if (obj.responseType == "login" && obj.result == true) {
-            setInterval(interval, 120);//80
+            if (interval_on == 0) {
+                interval_on = 1;
+                setInterval(interval, 100);//80
+            }
             console.log("...LOGGED");
             console.log("SESSION " + session);
             console.log("Page " + (pageIndex + 1));
