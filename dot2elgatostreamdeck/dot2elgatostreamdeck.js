@@ -701,7 +701,7 @@ client.onopen = function () {
 
 client.onclose = function () {
     console.log('Client Closed');
-    streamDeck.clearPanel();
+    streamDeck.resetToLogo();
     //process.exit();
 };
 
